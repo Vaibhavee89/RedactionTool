@@ -81,7 +81,7 @@ This is a multimedia redaction tool built with Streamlit, capable of processing 
 
 ```bash
 .
-├── app.py                 # Main Streamlit application
+├── redaction.py                 # Main Streamlit application
 ├── README.md              # Project documentation
 ├── requirements.txt       # Python package dependencies
 ```
