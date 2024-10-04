@@ -23,7 +23,7 @@ fake_en = Faker('en')
 fake_hi = Faker('hi')
 
 # Initialize Tesseract OCR for image text extraction
-pytesseract.pytesseract.tesseract_cmd = r'D:\tesseract-ocr-w64-setup-5.4.0.20240606.exe'  # Update this with your Tesseract path
+# pytesseract.pytesseract.tesseract_cmd = r'D:\tesseract-ocr-w64-setup-5.4.0.20240606.exe'  
 
 
 def redact_multilingual(text, entity_types, redaction_level):
@@ -86,9 +86,9 @@ def process_video(video_file, output_file):
             blurred_face = cv2.GaussianBlur(face, (99, 99), 30)
             frame[y:y+h, x:x+w] = blurred_face
 
-        # Optional: Perform OCR and redact text in each frame
+        # Perform OCR and redact text in each frame
         text_in_frame = pytesseract.image_to_string(frame)
-        # Apply your text redaction logic here for the text_in_frame if necessary
+        
 
         out.write(frame)
 
