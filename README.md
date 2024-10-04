@@ -148,7 +148,7 @@ This is a multimedia redaction tool built with Streamlit, capable of processing 
    - The Streamlit app will start, and a new browser tab should open automatically pointing to `http://localhost:8501`.
    - If it doesn't open automatically, you can manually navigate to this URL in your web browser.
 
-### Debugging in VS Code (Optional)
+### Debugging in VS Code
 
 If you wish to debug your application:
 
