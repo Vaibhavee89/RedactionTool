@@ -1,5 +1,5 @@
 
-# Multimedia Redaction Tool
+# Redaction Tool
 
 This is a multimedia redaction tool built with Streamlit, capable of processing text, images, and video files. It supports both English and Hindi for text redaction using Named Entity Recognition (NER) and also allows for the redaction of faces in images and videos using facial detection techniques.
 
