@@ -18,7 +18,7 @@ This is a multimedia redaction tool built with Streamlit, capable of processing 
 
 - **Streamlit**: For building the web-based UI.
 - **spaCy**: For Named Entity Recognition (NER) to identify sensitive information in text.
-- **Faker**: To generate synthetic data for redaction.
+#- **Faker**: To generate synthetic data for redaction.
 - **Tesseract OCR**: For extracting text from images.
 - **OpenCV**: For face detection and blurring in images and videos.
 - **pdfplumber**: For extracting text from PDF files.
