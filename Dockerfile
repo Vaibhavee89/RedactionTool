@@ -32,4 +32,4 @@ RUN python -m spacy download xx_ent_wiki_sm
 EXPOSE 8501
 
 # Run the Streamlit app
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=
+CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
