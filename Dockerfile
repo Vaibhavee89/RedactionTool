@@ -26,6 +26,9 @@ RUN pip install --upgrade pip && \
 RUN python -m spacy download en_core_web_trf && \
     python -m spacy download xx_ent_wiki_sm
 
+RUN python -m spacy download en_core_web_trf
+RUN python -m spacy download xx_ent_wiki_sm
+
 # Copy all remaining application code
 COPY . .
 
