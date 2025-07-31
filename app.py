@@ -12,6 +12,9 @@ from faker import Faker
 import re
 from langdetect import detect
 import io
+import subprocess
+from io import BytesIO
+
 
 # Configure Tesseract path (update this path according to your installation)
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Windows
@@ -28,10 +31,13 @@ def load_spacy_models():
         nlp_multi = spacy.load("xx_ent_wiki_sm")
         return nlp_en, nlp_multi
     except OSError:
-        st.error("spaCy models not found. Please install them using:")
-        st.code("python -m spacy download en_core_web_trf")
-        st.code("python -m spacy download xx_ent_wiki_sm")
-        return None, None
+        st.warning("Downloading required spaCy models...")
+        subprocess.run(["python", "-m", "spacy", "download", "en_core_web_trf"])
+        subprocess.run(["python", "-m", "spacy", "download", "xx_ent_wiki_sm"])
+        nlp_en = spacy.load("en_core_web_trf")
+        nlp_multi = spacy.load("xx_ent_wiki_sm")
+        return nlp_en, nlp_multi
+
 
 def detect_language(text):
     """Detect the language of the text"""
