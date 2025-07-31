@@ -17,7 +17,7 @@ from io import BytesIO
 
 
 # Configure Tesseract path (update this path according to your installation)
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Windows
+pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Vaibh\tesseract.exe'  # Windows
 # For macOS/Linux, it might be: pytesseract.pytesseract.tesseract_cmd = '/usr/local/bin/tesseract'
 
 # Initialize Faker for generating replacement text
@@ -262,7 +262,7 @@ def main():
             
             with col1:
                 st.subheader("Original Image")
-                st.image(image, use_column_width=True)
+                st.image(image, use_container_width=True)
             
             # OCR option
             if st.sidebar.checkbox("Extract and redact text from image (OCR)"):
