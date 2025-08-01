@@ -301,7 +301,7 @@ def main():
                         
                         with col2:
                             st.subheader("Redacted Image")
-                            st.image(blurred_pil, use_column_width=True)
+                            st.image(blurred_pil, use_container_width=True)
                         
                         # Download button
                         buf = io.BytesIO()
