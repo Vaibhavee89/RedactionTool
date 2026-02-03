@@ -12,3 +12,7 @@ numpy
 spacy
 
 
+presidio-analyzer
+presidio-anonymizer
+paddlepaddle
+paddleocr
