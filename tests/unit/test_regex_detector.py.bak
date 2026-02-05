@@ -48,7 +48,7 @@ class TestRegexPIIDetector:
 
         for text in test_cases:
             entities = detector.detect(text)
-            pan_entities = [e for e in entities if e['entity_type'] == 'PAN']
+            pan_entities = [e for e in result['entities'] if e['entity_type'] == 'PAN']
             assert len(pan_entities) == 1, f"Failed for: {text}"
             assert pan_entities[0]['text'] == 'ABCDE1234F'
 
@@ -57,7 +57,7 @@ class TestRegexPIIDetector:
         text = "My Aadhaar is 1234 5678 9012"
         entities = detector.detect(text)
 
-        aadhaar_entities = [e for e in entities if e['entity_type'] == 'AADHAAR']
+        aadhaar_entities = [e for e in result['entities'] if e['entity_type'] == 'AADHAAR']
         assert len(aadhaar_entities) == 1
         assert '1234' in aadhaar_entities[0]['text']
 
@@ -87,7 +87,7 @@ class TestRegexPIIDetector:
 
         for text, should_detect in test_cases:
             entities = detector.detect(text)
-            phone_entities = [e for e in entities if e['entity_type'] == 'PHONE']
+            phone_entities = [e for e in result['entities'] if e['entity_type'] == 'PHONE']
 
             if should_detect:
                 assert len(phone_entities) > 0, f"Should detect: {text}"
@@ -104,7 +104,7 @@ class TestRegexPIIDetector:
 
         for email in test_cases:
             entities = detector.detect(f"Email: {email}")
-            email_entities = [e for e in entities if e['entity_type'] == 'EMAIL']
+            email_entities = [e for e in result['entities'] if e['entity_type'] == 'EMAIL']
             assert len(email_entities) == 1, f"Failed for: {email}"
             assert email in email_entities[0]['text']
 
@@ -121,7 +121,7 @@ class TestRegexPIIDetector:
         entities = detector.detect(text)
 
         # Should detect multiple entity types
-        entity_types = {e['entity_type'] for e in entities}
+        entity_types = {e['entity_type'] for e in result['entities']}
         assert 'PAN' in entity_types
         assert 'PHONE' in entity_types
         assert 'EMAIL' in entity_types
@@ -132,15 +132,15 @@ class TestRegexPIIDetector:
         text = "This is a normal sentence with no personal information."
         entities = detector.detect(text)
 
-        assert len(entities) == 0
+        assert len(result['entities']) == 0
 
     def test_confidence_scores(self, detector):
         """Test confidence scores are set correctly."""
         text = "PAN: ABCDE1234F"
         entities = detector.detect(text)
 
-        assert len(entities) > 0
-        for entity in entities:
+        assert len(result['entities']) > 0
+        for entity in result['entities']:
             assert 'confidence' in entity
             assert 0.0 <= entity['confidence'] <= 1.0
 
@@ -149,7 +149,7 @@ class TestRegexPIIDetector:
         text = "PAN: ABCDE1234F and Phone: 9876543210"
         entities = detector.detect(text)
 
-        for entity in entities:
+        for entity in result['entities']:
             # Extract text using positions
             extracted = text[entity['start']:entity['end']]
             assert entity['text'] in extracted or extracted in entity['text']
@@ -167,10 +167,14 @@ class TestRegexPIIDetector:
         """Test min_confidence parameter filters results."""
         text = "PAN: ABCDE1234F"
 
-        # Note: RegexProvider doesn't support min_confidence parameter
-        # This test just ensures detect() works without the parameter
-        entities = detector.detect(text)
-        assert len(entities) > 0
+        # With low threshold
+        result_low = detector.detect(text, min_confidence=0.1)
+        assert len(result_low['entities']) > 0
+
+        # With very high threshold (should filter most)
+        result_high = detector.detect(text, min_confidence=1.0)
+        # Regex patterns typically have high confidence
+        assert len(result_high['entities']) >= 0
 
     def test_hindi_patterns(self, detector):
         """Test Hindi PII pattern detection."""
@@ -180,18 +184,18 @@ class TestRegexPIIDetector:
         entities = detector.detect(text)
 
         # Should at least detect the PAN
-        pan_entities = [e for e in entities if e['entity_type'] == 'PAN']
+        pan_entities = [e for e in result['entities'] if e['entity_type'] == 'PAN']
         assert len(pan_entities) >= 1
 
     def test_edge_case_empty_text(self, detector):
         """Test empty text input."""
         entities = detector.detect("")
-        assert len(entities) == 0
+        assert len(result['entities']) == 0
 
     def test_edge_case_whitespace(self, detector):
         """Test whitespace-only text."""
         entities = detector.detect("   \n\t  ")
-        assert len(entities) == 0
+        assert len(result['entities']) == 0
 
     def test_edge_case_special_characters(self, detector):
         """Test text with special characters."""
@@ -203,20 +207,14 @@ class TestRegexPIIDetector:
         assert 'ABCDE1234F' in pan_entities[0]['text']
 
     def test_detection_metadata(self, detector):
-        """Test detection result is a list of entities."""
+        """Test detection result metadata."""
         text = "PAN: ABCDE1234F"
         entities = detector.detect(text)
 
-        # RegexProvider returns a list of entities directly
-        assert isinstance(entities, list)
-        assert len(entities) > 0
-        # Check entity structure
-        for entity in entities:
-            assert 'entity_type' in entity
-            assert 'start' in entity
-            assert 'end' in entity
-            assert 'text' in entity
-            assert 'confidence' in entity
+        assert 'entities' in result
+        assert 'total_entities' in result
+        assert 'detector_name' in result
+        assert result['detector_name'] == 'RegexProvider'
 
     def test_indian_passport(self, detector):
         """Test Indian passport detection if supported."""
@@ -224,9 +222,9 @@ class TestRegexPIIDetector:
         entities = detector.detect(text)
 
         # Check if passport pattern is detected
-        passport_entities = [e for e in entities if 'PASSPORT' in e['entity_type'].upper()]
+        passport_entities = [e for e in result['entities'] if 'PASSPORT' in e['entity_type'].upper()]
         # May or may not be supported, just check it doesn't crash
-        assert isinstance(entities, list)
+        assert isinstance(result['entities'], list)
 
     def test_case_insensitive_detection(self, detector):
         """Test case-insensitive pattern matching."""
@@ -239,7 +237,7 @@ class TestRegexPIIDetector:
         for text in test_cases:
             entities = detector.detect(text)
             # Should detect regardless of case
-            assert len(entities) > 0, f"Failed for: {text}"
+            assert len(result['entities']) > 0, f"Failed for: {text}"
 
 
 if __name__ == "__main__":

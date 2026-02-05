@@ -234,6 +234,44 @@ class PolicyManager:
             'errors': errors
         }
 
+    def get_policy_summary(self, policy_name: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Get summary of policy details.
+        
+        Args:
+            policy_name: Name of policy (None for current)
+            
+        Returns:
+            Dictionary with policy summary
+        """
+        policy = self.get_policy(policy_name)
+        if not policy:
+            return {}
+            
+        return {
+            "name": policy.name,
+            "description": policy.description,
+            "version": policy.version,
+            "rules_count": len(policy.rules),
+            "global_config": policy.global_config
+        }
+
+    def get_action_for_entity(self, entity_type: str) -> str:
+        """
+        Get action for a specific entity type from current policy.
+        
+        Args:
+            entity_type: Entity type to check
+            
+        Returns:
+            Action string (e.g., 'block', 'mask')
+        """
+        if not self.current_policy:
+            return 'block'
+            
+        rule = self.current_policy.get_rule(entity_type)
+        return rule.get('action', 'block')
+
     def save_policy(self, policy: RedactionPolicy, file_path: Optional[str] = None):
         """
         Save policy to YAML file.

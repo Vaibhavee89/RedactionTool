@@ -59,7 +59,8 @@ def load_policy_file(policy_name):
 
     try:
         policy_manager = PolicyManager()
-        policy_manager.load_policy(str(policy_path))
+        policy = policy_manager.load_policy_from_file(str(policy_path))
+        policy_manager.set_policy(policy.name)
         return policy_manager
     except Exception as e:
         st.error(f"Failed to load policy: {e}")
