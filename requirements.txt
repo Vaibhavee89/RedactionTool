@@ -9,9 +9,9 @@ pytesseract
 opencv-python
 opencv-python-headless
 numpy
-spacy
-
-
+# Models (Install directly)
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
+https://github.com/explosion/spacy-models/releases/download/xx_ent_wiki_sm-3.7.1/xx_ent_wiki_sm-3.7.1-py3-none-any.whl
 presidio-analyzer
 presidio-anonymizer
 paddlepaddle
