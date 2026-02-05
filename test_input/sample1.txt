@@ -1,0 +1,8 @@
+Contact Information:
+Name: John Doe
+Email: john.doe@example.com
+Phone: +1-555-123-4567
+SSN: 123-45-6789
+Address: 123 Main Street, Springfield, IL 62701
+
+This document contains sensitive information that should be redacted.

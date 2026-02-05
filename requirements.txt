@@ -1,10 +1,12 @@
 streamlit
 python-docx
 pdfplumber
+pdf2image
 faker
 spacy
 langdetect
 Pillow
+PyYAML
 pytesseract
 opencv-python
 opencv-python-headless

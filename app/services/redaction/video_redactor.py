@@ -11,23 +11,34 @@ class VideoRedactor:
     def redact_faces(self, video_path: str, output_path: str, progress_callback=None):
         """
         Process video frames to blur faces.
-        
+        Supports MP4, AVI, MOV, and other common video formats.
+
         Args:
             video_path: Path to input video.
             output_path: Path to save redacted video.
             progress_callback: Optional callable(float) for progress steps (0.0 to 1.0).
         """
         cap = cv2.VideoCapture(video_path)
-        
+
+        if not cap.isOpened():
+            raise ValueError(f"Could not open video file: {video_path}")
+
         # Get video properties
         fps = int(cap.get(cv2.CAP_PROP_FPS))
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        
-        # Define codec and create VideoWriter
-        # 'mp4v' is widely compatible
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+
+        # Define codec based on output file extension
+        # Supports MP4, AVI, and other formats
+        ext = output_path.split('.')[-1].lower()
+        if ext == 'avi':
+            fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        elif ext == 'mov':
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        else:  # Default to mp4
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+
         out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
         
         frame_count = 0

@@ -1,0 +1,16 @@
+Customer Database Export:
+
+Customer 1: Michael Johnson
+Email: mjohnson@email.com
+Phone: 555-111-2222
+Address: 456 Oak Avenue, Boston, MA 02101
+
+Customer 2: Sarah Williams
+Email: sarah.w@example.org
+Phone: 555-333-4444
+SSN: 987-65-4321
+
+Customer 3: Robert Brown
+Phone: +1 (555) 555-5555
+Email: rbrown@test.com
+DOB: 12/25/1990

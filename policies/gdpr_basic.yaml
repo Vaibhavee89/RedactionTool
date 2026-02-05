@@ -1,0 +1,133 @@
+name: GDPR Basic Compliance
+description: |
+  Basic GDPR compliance policy for protecting personal data in European context.
+  Covers Article 4 definitions of personal data and special categories.
+version: "1.0"
+
+global:
+  min_confidence: 0.6
+  preserve_format: true
+
+rules:
+  # Direct Identifiers (Must be redacted under GDPR)
+  PERSON:
+    action: tokenize
+    prefix: "NAME_"
+    preserve_mapping: true
+    min_confidence: 0.7
+    description: "Names - tokenized for data processing audits"
+
+  EMAIL:
+    action: mask
+    show_first: 1
+    show_last: 0
+    mask_char: "*"
+    preserve_format: true
+    min_confidence: 0.8
+    description: "Email addresses - mask local part"
+
+  PHONE:
+    action: mask
+    show_last: 3
+    mask_char: "X"
+    min_confidence: 0.7
+    description: "Phone numbers - show last 3 digits"
+
+  ADDRESS:
+    action: block
+    min_confidence: 0.6
+    description: "Physical addresses - full redaction"
+
+  LOCATION:
+    action: mask
+    show_last: 10
+    min_confidence: 0.6
+    description: "Location data - partial masking"
+
+  # Online Identifiers
+  IP_ADDRESS:
+    action: hash
+    algorithm: sha256
+    truncate: 12
+    prefix: "IP_"
+    min_confidence: 0.8
+    description: "IP addresses - hashed for pseudonymization"
+
+  URL:
+    action: allow
+    min_confidence: 0.5
+    description: "URLs - allow public URLs"
+
+  # Financial Identifiers
+  CREDIT_CARD:
+    action: partial_mask
+    pattern: "XXXX-XXXX-XXXX-****"
+    min_confidence: 0.9
+    description: "Payment card data (PCI-DSS + GDPR)"
+
+  IBAN:
+    action: mask
+    show_last: 4
+    mask_char: "X"
+    min_confidence: 0.8
+
+  # National Identifiers
+  SSN:
+    action: block
+    min_confidence: 0.8
+    description: "Social security numbers - full redaction"
+
+  PASSPORT:
+    action: block
+    min_confidence: 0.8
+
+  NHS:
+    action: block
+    min_confidence: 0.8
+    description: "UK National Health Service numbers"
+
+  # Special Categories (Article 9 - Sensitive data)
+  MEDICAL:
+    action: block
+    min_confidence: 0.7
+    description: "Health data - strict protection under Article 9"
+
+  MEDICAL_LICENSE:
+    action: block
+    min_confidence: 0.7
+
+  # Organizational Data
+  ORGANIZATION:
+    action: allow
+    min_confidence: 0.5
+    description: "Organization names - generally allowed"
+
+  # Dates (Be cautious with DOB)
+  DATE:
+    action: label
+    format: "[DATE]"
+    min_confidence: 0.6
+    description: "Dates - labeled (may contain DOB)"
+
+  # Cryptographic and Technical
+  CRYPTO:
+    action: block
+    min_confidence: 0.8
+    description: "Cryptocurrency addresses - block for security"
+
+  # Indian-specific (if processing Indian data)
+  PAN:
+    action: block
+    min_confidence: 0.8
+
+  AADHAAR:
+    action: block
+    min_confidence: 0.8
+    description: "Aadhaar considered sensitive under GDPR principles"
+
+  # Default for unknown types
+  "*":
+    action: mask
+    show_last: 3
+    mask_char: "*"
+    min_confidence: 0.6

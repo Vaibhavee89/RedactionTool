@@ -1,0 +1,8 @@
+Employee Record:
+Employee: Jane Smith
+Email: jane.smith@company.com
+Phone: (555) 987-6543
+DOB: 05/15/1985
+Credit Card: 4532-1234-5678-9012
+
+Confidential employee information.

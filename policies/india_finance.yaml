@@ -1,0 +1,162 @@
+name: India Finance Compliance
+description: |
+  Redaction policy for Indian financial documents compliant with RBI and IT Act guidelines.
+  Protects sensitive financial information including bank accounts, PAN, Aadhaar, and payment details.
+version: "1.0"
+
+global:
+  min_confidence: 0.5
+  preserve_format: true
+
+rules:
+  # Indian Identity Documents
+  PAN:
+    action: block
+    min_confidence: 0.8
+    description: "PAN card numbers - full redaction"
+
+  AADHAAR:
+    action: partial_mask
+    preserve_format: true
+    pattern: "XXXX-XXXX-1234"
+    min_confidence: 0.8
+    description: "Aadhaar - show last 4 digits as per regulations"
+
+  PASSPORT:
+    action: block
+    min_confidence: 0.7
+    description: "Passport numbers - full redaction"
+
+  VOTER_ID:
+    action: block
+    min_confidence: 0.7
+
+  DRIVING_LICENSE:
+    action: mask
+    show_last: 4
+    mask_char: "*"
+    min_confidence: 0.7
+
+  # Financial Information
+  CREDIT_CARD:
+    action: partial_mask
+    pattern: "XXXX-XXXX-XXXX-1234"
+    preserve_format: true
+    min_confidence: 0.9
+    description: "Credit card - show last 4 digits only"
+
+  DEBIT_CARD:
+    action: partial_mask
+    pattern: "XXXX-XXXX-XXXX-1234"
+    preserve_format: true
+    min_confidence: 0.9
+
+  BANK_ACCOUNT:
+    action: mask
+    show_last: 4
+    mask_char: "X"
+    min_confidence: 0.8
+    description: "Bank account - show last 4 digits"
+
+  IFSC:
+    action: partial_mask
+    show_first: 4
+    show_last: 3
+    mask_char: "X"
+    min_confidence: 0.8
+    description: "IFSC code - show bank code and branch code"
+
+  UPI_ID:
+    action: mask
+    show_first: 2
+    show_last: 0
+    mask_char: "*"
+    min_confidence: 0.7
+
+  # Personal Information
+  PERSON:
+    action: mask
+    show_first: 1
+    show_last: 0
+    mask_char: "*"
+    min_confidence: 0.7
+    description: "Names - show first character only"
+
+  EMAIL:
+    action: partial_mask
+    preserve_format: true
+    show_first: 2
+    show_last: 0
+    mask_char: "*"
+    min_confidence: 0.8
+    description: "Email - mask username, keep domain visible"
+
+  PHONE:
+    action: mask
+    show_last: 4
+    mask_char: "X"
+    min_confidence: 0.7
+    description: "Phone - show last 4 digits"
+
+  PHONE_IN:
+    action: mask
+    show_last: 4
+    mask_char: "X"
+    min_confidence: 0.7
+
+  ADDRESS:
+    action: mask
+    show_last: 20
+    mask_char: "█"
+    min_confidence: 0.6
+    description: "Address - show last portion (city/state)"
+
+  # Hindi Entity Types
+  HINDI_PAN:
+    action: block
+    min_confidence: 0.8
+
+  HINDI_AADHAAR:
+    action: partial_mask
+    pattern: "XXXX-XXXX-1234"
+    min_confidence: 0.8
+
+  HINDI_PHONE:
+    action: mask
+    show_last: 4
+    min_confidence: 0.7
+
+  HINDI_EMAIL:
+    action: partial_mask
+    preserve_format: true
+    min_confidence: 0.8
+
+  HINDI_NAME:
+    action: mask
+    show_first: 1
+    min_confidence: 0.7
+
+  HINDI_ADDRESS:
+    action: mask
+    show_last: 15
+    min_confidence: 0.6
+
+  # Salary and Financial Amounts
+  MONEY:
+    action: hash
+    algorithm: sha256
+    truncate: 8
+    prefix: "AMT_"
+    min_confidence: 0.6
+    description: "Salary/amounts - hash for privacy"
+
+  # Dates - Allow but can be configured
+  DATE:
+    action: allow
+    min_confidence: 0.5
+    description: "Dates - allowed (configure if needed)"
+
+  # Default rule for unknown types
+  "*":
+    action: block
+    min_confidence: 0.5

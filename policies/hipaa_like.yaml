@@ -1,0 +1,160 @@
+name: HIPAA-Like Healthcare Compliance
+description: |
+  Healthcare data protection policy inspired by HIPAA Privacy Rule.
+  Protects 18 identifiers under HIPAA Safe Harbor method.
+  Note: This is a basic implementation - consult HIPAA compliance experts for production use.
+version: "1.0"
+
+global:
+  min_confidence: 0.7
+  preserve_format: false
+
+rules:
+  # 1. Names
+  PERSON:
+    action: block
+    min_confidence: 0.8
+    description: "Patient names - HIPAA identifier #1"
+
+  # 2. Geographic subdivisions smaller than state
+  ADDRESS:
+    action: block
+    min_confidence: 0.7
+    description: "Addresses, cities, ZIP codes - HIPAA identifiers #2-3"
+
+  LOCATION:
+    action: block
+    min_confidence: 0.7
+
+  # 3. Dates (except year) related to individual
+  DATE:
+    action: label
+    format: "[DATE_REDACTED]"
+    min_confidence: 0.6
+    description: "Dates - HIPAA identifier #4 (keep year only if needed)"
+
+  # 4. Telephone numbers
+  PHONE:
+    action: block
+    min_confidence: 0.8
+    description: "Phone numbers - HIPAA identifier #5"
+
+  PHONE_IN:
+    action: block
+    min_confidence: 0.8
+
+  # 5. Fax numbers (included in phone)
+
+  # 6. Email addresses
+  EMAIL:
+    action: block
+    min_confidence: 0.8
+    description: "Email addresses - HIPAA identifier #7"
+
+  # 7. Social Security numbers
+  SSN:
+    action: block
+    min_confidence: 0.9
+    description: "SSN - HIPAA identifier #8"
+
+  US_SSN:
+    action: block
+    min_confidence: 0.9
+
+  # 8. Medical record numbers
+  MEDICAL:
+    action: tokenize
+    prefix: "MRN_"
+    preserve_mapping: true
+    min_confidence: 0.8
+    description: "Medical record numbers - HIPAA identifier #9"
+
+  MEDICAL_LICENSE:
+    action: block
+    min_confidence: 0.8
+
+  MEDICAL_RECORD:
+    action: tokenize
+    prefix: "MRN_"
+    min_confidence: 0.8
+
+  # 9. Health plan beneficiary numbers
+  # 10. Account numbers
+  BANK_ACCOUNT:
+    action: block
+    min_confidence: 0.8
+    description: "Account numbers - HIPAA identifier #11"
+
+  # 11. Certificate/license numbers
+  DRIVING_LICENSE:
+    action: block
+    min_confidence: 0.8
+
+  PASSPORT:
+    action: block
+    min_confidence: 0.8
+
+  # 12. Vehicle identifiers
+  VEHICLE_REGISTRATION:
+    action: block
+    min_confidence: 0.7
+    description: "Vehicle identifiers - HIPAA identifier #12"
+
+  # 13. Device identifiers and serial numbers
+  # (Not commonly detected by NER - would need custom patterns)
+
+  # 14. URLs
+  URL:
+    action: block
+    min_confidence: 0.7
+    description: "Web URLs - HIPAA identifier #14"
+
+  # 15. IP addresses
+  IP_ADDRESS:
+    action: block
+    min_confidence: 0.8
+    description: "IP addresses - HIPAA identifier #15"
+
+  # 16. Biometric identifiers
+  # (Would need specialized detection)
+
+  # 17. Full face photos
+  # (Image processing - not text-based)
+
+  # 18. Any other unique identifying number
+  CREDIT_CARD:
+    action: block
+    min_confidence: 0.9
+
+  CRYPTO:
+    action: block
+    min_confidence: 0.8
+
+  # Indian healthcare context
+  PAN:
+    action: block
+    min_confidence: 0.8
+
+  AADHAAR:
+    action: block
+    min_confidence: 0.8
+    description: "Aadhaar for Indian healthcare data"
+
+  # Organizations - can be allowed for research
+  ORGANIZATION:
+    action: allow
+    min_confidence: 0.5
+    description: "Hospital/clinic names - may be allowed depending on context"
+
+  # Money amounts - typically allowed unless linked to individual
+  MONEY:
+    action: hash
+    algorithm: sha256
+    truncate: 8
+    prefix: "COST_"
+    min_confidence: 0.6
+
+  # Default - block everything else for maximum privacy
+  "*":
+    action: block
+    min_confidence: 0.7

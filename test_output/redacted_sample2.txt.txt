@@ -1,0 +1,8 @@
+Employee Record:
+Employee: ██████████
+Email: ██████████████████████
+Phone: ██████████████
+DOB: ██████████
+███████████: ███████████████████
+
+Confidential employee information.
