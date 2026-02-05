@@ -13,9 +13,16 @@ class NERProvider:
         try:
             return spacy.load(model_name)
         except OSError:
-            print(f"Downloading model {model_name}...")
-            subprocess.run([sys.executable, "-m", "spacy", "download", model_name])
-            return spacy.load(model_name)
+            # Fallback: Try importing as a module (common in some envs)
+            try:
+                import importlib
+                # Handle standard name -> module name if needed, but usually they match for these models
+                module = importlib.import_module(model_name)
+                return module.load()
+            except (ImportError, AttributeError):
+                print(f"Downloading model {model_name}...")
+                subprocess.run([sys.executable, "-m", "spacy", "download", model_name])
+                return spacy.load(model_name)
 
     def detect(self, text: str, language: str = 'en') -> List[Dict[str, Any]]:
         nlp = self.nlp_en if language == 'en' else self.nlp_multi
