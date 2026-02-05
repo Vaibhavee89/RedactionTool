@@ -12,7 +12,7 @@ class Config:
     
     # Tesseract
     # Try different common paths or environment variable
-    TESSERACT_CMD = os.getenv("TESSERACT_CMD", r'C:\Users\Vaibh\tesseract.exe') # Default from original app.py
+    TESSERACT_CMD = os.getenv("TESSERACT_CMD", '/opt/homebrew/bin/tesseract')
     
     # Models
     SPACY_MODEL_EN = "en_core_web_sm"

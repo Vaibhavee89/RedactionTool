@@ -14,6 +14,15 @@ class ImageLoader(BaseLoader):
         image = Image.open(file_path)
         return pytesseract.image_to_string(image)
 
+    def get_ocr_data(self, file_path: str) -> Dict[str, Any]:
+        """
+        Get structured OCR data including bounding boxes.
+        Returns a dict compatible with pytesseract.image_to_data
+        """
+        image = Image.open(file_path)
+        # Output dict with keys: 'level', 'page_num', 'block_num', 'par_num', 'line_num', 'word_num', 'left', 'top', 'width', 'height', 'conf', 'text'
+        return pytesseract.image_to_data(image, output_type=pytesseract.Output.DICT)
+
     def load_metadata(self, file_path: str) -> Dict[str, Any]:
         image = Image.open(file_path)
         return {
