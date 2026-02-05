@@ -1,0 +1,260 @@
+version: '3.8'
+
+# ============================================================================
+# Docker Compose for RedactionTool
+# Includes: Streamlit UI, API Server, Redis Cache (optional)
+# Production-ready with health checks and proper networking
+# ============================================================================
+
+services:
+  # ==========================================================================
+  # Streamlit UI Service
+  # ==========================================================================
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.improved
+      args:
+        - PYTHON_VERSION=3.10
+    container_name: redaction_ui
+    image: redaction-tool:ui-latest
+
+    # Port mapping
+    ports:
+      - "${UI_PORT:-8501}:8501"
+
+    # Volume mounts
+    volumes:
+      - ./uploads:/app/uploads:rw
+      - ./output:/app/output:rw
+      - ./audit_logs:/app/audit_logs:rw
+      - ./policies:/app/policies:ro
+      - ./config:/app/config:ro
+
+    # Environment variables (can be overridden by .env file)
+    environment:
+      # Application settings
+      - APP_NAME=${APP_NAME:-RedactionTool}
+      - APP_ENV=${APP_ENV:-production}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+
+      # Streamlit settings
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+
+      # OCR settings
+      - TESSERACT_CMD=tesseract
+      - TESSERACT_LANG=${TESSERACT_LANG:-eng+hin}
+
+      # Performance settings
+      - MAX_WORKERS=${MAX_WORKERS:-4}
+      - BATCH_SIZE=${BATCH_SIZE:-100}
+      - CACHE_ENABLED=${CACHE_ENABLED:-true}
+      - CACHE_SIZE=${CACHE_SIZE:-1000}
+
+      # Security settings
+      - ENABLE_AUDIT_LOG=${ENABLE_AUDIT_LOG:-true}
+      - HASH_DOCUMENTS=${HASH_DOCUMENTS:-true}
+      - RETENTION_DAYS=${RETENTION_DAYS:-90}
+
+      # Redis connection (if using cache service)
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_DB=${REDIS_DB:-0}
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '${UI_CPU_LIMIT:-2.0}'
+          memory: ${UI_MEMORY_LIMIT:-4G}
+        reservations:
+          cpus: '${UI_CPU_RESERVATION:-0.5}'
+          memory: ${UI_MEMORY_RESERVATION:-1G}
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Network
+    networks:
+      - redaction-network
+
+    # Dependencies
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # ==========================================================================
+  # API Service (FastAPI for programmatic access)
+  # ==========================================================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: redaction_api
+    image: redaction-tool:api-latest
+
+    # Port mapping
+    ports:
+      - "${API_PORT:-8000}:8000"
+
+    # Volume mounts
+    volumes:
+      - ./uploads:/app/uploads:rw
+      - ./output:/app/output:rw
+      - ./audit_logs:/app/audit_logs:rw
+      - ./policies:/app/policies:ro
+      - ./config:/app/config:ro
+
+    # Environment variables
+    environment:
+      - APP_NAME=${APP_NAME:-RedactionTool API}
+      - APP_ENV=${APP_ENV:-production}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - API_KEY=${API_KEY:-your-secret-api-key-here}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      - MAX_WORKERS=${MAX_WORKERS:-4}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '${API_CPU_LIMIT:-4.0}'
+          memory: ${API_MEMORY_LIMIT:-8G}
+        reservations:
+          cpus: '${API_CPU_RESERVATION:-1.0}'
+          memory: ${API_MEMORY_RESERVATION:-2G}
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Network
+    networks:
+      - redaction-network
+
+    # Dependencies
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # ==========================================================================
+  # Redis Cache Service (optional but recommended)
+  # ==========================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: redaction_redis
+
+    # Port mapping (optional, for external access)
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+
+    # Persistent storage
+    volumes:
+      - redis-data:/data
+
+    # Redis configuration
+    command: >
+      redis-server
+      --maxmemory ${REDIS_MAXMEMORY:-512mb}
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+      --appendfsync everysec
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Network
+    networks:
+      - redaction-network
+
+  # ==========================================================================
+  # Nginx Reverse Proxy (optional, for production)
+  # ==========================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: redaction_nginx
+
+    # Port mapping
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+
+    # Volume mounts
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./config/ssl:/etc/nginx/ssl:ro
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Network
+    networks:
+      - redaction-network
+
+    # Dependencies
+    depends_on:
+      - ui
+      - api
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  redaction-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+# ============================================================================
+# Volumes
+# ============================================================================
+volumes:
+  redis-data:
+    driver: local

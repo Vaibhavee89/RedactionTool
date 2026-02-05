@@ -1,0 +1,70 @@
+# ============================================================================
+# Dockerfile for RedactionTool API (FastAPI)
+# RESTful API for programmatic access
+# ============================================================================
+
+# Stage 1: Builder
+FROM python:3.10-slim as builder
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential gcc g++ && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY requirements.txt /tmp/
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r /tmp/requirements.txt && \
+    pip install --no-cache-dir fastapi uvicorn[standard] python-multipart redis
+
+RUN python -m spacy download en_core_web_sm && \
+    python -m spacy download xx_ent_wiki_sm
+
+# Stage 2: Runtime
+FROM python:3.10-slim
+
+LABEL maintainer="RedactionTool Team"
+LABEL description="RedactionTool REST API"
+LABEL version="2.0"
+
+RUN groupadd -r apiuser && useradd -r -g apiuser apiuser
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tesseract-ocr \
+    libtesseract-dev \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH" \
+    API_PORT=8000 \
+    API_HOST=0.0.0.0 \
+    WORKERS=4
+
+COPY --from=builder /opt/venv /opt/venv
+
+WORKDIR /app
+
+COPY --chown=apiuser:apiuser . .
+
+RUN mkdir -p uploads output audit_logs && \
+    chown -R apiuser:apiuser /app
+
+USER apiuser
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+EXPOSE 8000
+
+CMD ["uvicorn", "api.main:app", \
+     "--host", "0.0.0.0", \
+     "--port", "8000", \
+     "--workers", "4", \
+     "--log-level", "info"]

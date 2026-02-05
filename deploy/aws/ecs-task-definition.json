@@ -1,0 +1,136 @@
+{
+  "family": "redaction-tool",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "2048",
+  "memory": "4096",
+  "executionRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/redactionToolTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "ui",
+      "image": "YOUR_ECR_REPO/redaction-tool:ui-latest",
+      "cpu": 1024,
+      "memory": 2048,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8501,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {"name": "APP_NAME", "value": "RedactionTool"},
+        {"name": "APP_ENV", "value": "production"},
+        {"name": "STREAMLIT_SERVER_PORT", "value": "8501"},
+        {"name": "STREAMLIT_SERVER_ADDRESS", "value": "0.0.0.0"},
+        {"name": "REDIS_HOST", "value": "redis.redaction.local"},
+        {"name": "MAX_WORKERS", "value": "4"}
+      ],
+      "secrets": [
+        {
+          "name": "API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT:secret:redaction/api-key"
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "efs-uploads",
+          "containerPath": "/app/uploads"
+        },
+        {
+          "sourceVolume": "efs-output",
+          "containerPath": "/app/output"
+        }
+      ],
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:8501/_stcore/health || exit 1"],
+        "interval": 30,
+        "timeout": 10,
+        "retries": 3,
+        "startPeriod": 40
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/redaction-tool",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ui"
+        }
+      }
+    },
+    {
+      "name": "api",
+      "image": "YOUR_ECR_REPO/redaction-tool:api-latest",
+      "cpu": 1024,
+      "memory": 2048,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {"name": "APP_NAME", "value": "RedactionTool API"},
+        {"name": "APP_ENV", "value": "production"},
+        {"name": "API_PORT", "value": "8000"},
+        {"name": "REDIS_HOST", "value": "redis.redaction.local"},
+        {"name": "MAX_WORKERS", "value": "4"}
+      ],
+      "secrets": [
+        {
+          "name": "API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:REGION:ACCOUNT:secret:redaction/api-key"
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "efs-uploads",
+          "containerPath": "/app/uploads"
+        },
+        {
+          "sourceVolume": "efs-output",
+          "containerPath": "/app/output"
+        }
+      ],
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"],
+        "interval": 30,
+        "timeout": 10,
+        "retries": 3,
+        "startPeriod": 30
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/redaction-tool",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "api"
+        }
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "name": "efs-uploads",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-XXXXX",
+        "transitEncryption": "ENABLED",
+        "authorizationConfig": {
+          "iam": "ENABLED"
+        }
+      }
+    },
+    {
+      "name": "efs-output",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "fs-XXXXX",
+        "transitEncryption": "ENABLED",
+        "authorizationConfig": {
+          "iam": "ENABLED"
+        }
+      }
+    }
+  ]
+}

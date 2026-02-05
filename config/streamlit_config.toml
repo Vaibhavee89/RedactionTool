@@ -1,0 +1,48 @@
+# Streamlit Configuration for Production Deployment
+# This file configures Streamlit for optimal performance and security
+
+[server]
+# Server configuration
+port = 8501
+address = "0.0.0.0"
+headless = true
+enableCORS = false
+enableXsrfProtection = true
+maxUploadSize = 200  # MB
+maxMessageSize = 200  # MB
+
+# File watcher (disable in production)
+fileWatcherType = "none"
+
+[browser]
+# Browser configuration
+gatherUsageStats = false
+serverAddress = "localhost"
+serverPort = 8501
+
+[theme]
+# Custom theme (optional)
+primaryColor = "#1f77b4"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f0f2f6"
+textColor = "#262730"
+font = "sans serif"
+
+[runner]
+# Script runner configuration
+magicEnabled = true
+fastReruns = true
+
+[client]
+# Client configuration
+showErrorDetails = true
+toolbarMode = "minimal"
+
+[logger]
+# Logging configuration
+level = "info"
+messageFormat = "%(asctime)s %(levelname)s: %(message)s"
+
+[deprecation]
+# Deprecation warnings
+showPyplotGlobalUse = false
