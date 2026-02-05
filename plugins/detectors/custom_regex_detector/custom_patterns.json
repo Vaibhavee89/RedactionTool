@@ -1,0 +1,41 @@
+{
+  "patterns": {
+    "CUSTOM_EMPLOYEE_ID": {
+      "pattern": "EMP-[0-9]{6}",
+      "name": "Employee ID",
+      "description": "Company employee identifier",
+      "confidence": 0.9,
+      "case_sensitive": false,
+      "examples": [
+        "EMP-123456",
+        "EMP-987654"
+      ]
+    },
+    "CUSTOM_PROJECT_CODE": {
+      "pattern": "PROJ-[A-Z]{3}-[0-9]{4}",
+      "name": "Project Code",
+      "description": "Internal project identifier",
+      "confidence": 0.85,
+      "case_sensitive": true,
+      "examples": [
+        "PROJ-ABC-1234",
+        "PROJ-XYZ-5678"
+      ]
+    },
+    "CUSTOM_TICKET_NUMBER": {
+      "pattern": "TICKET-[0-9]{8}",
+      "name": "Support Ticket",
+      "description": "Support ticket number",
+      "confidence": 0.8,
+      "case_sensitive": false,
+      "examples": [
+        "TICKET-12345678"
+      ]
+    }
+  },
+  "metadata": {
+    "version": "1.0",
+    "description": "Custom regex patterns for organization-specific entities",
+    "last_updated": "2026-02-05"
+  }
+}

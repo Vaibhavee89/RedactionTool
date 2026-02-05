@@ -1,0 +1,133 @@
+# Extensions Configuration
+# Configuration for RedactionTool extensibility framework
+
+# Plugin Settings
+plugins:
+  # Enable plugin system
+  enabled: true
+
+  # Plugin discovery directory
+  directory: "plugins/detectors"
+
+  # Auto-discover plugins on startup
+  auto_discover: true
+
+  # Default plugin priority (1-10, higher = higher priority)
+  default_priority: 3
+
+  # Plugin execution timeout (seconds)
+  timeout_seconds: 30
+
+  # Enable/disable specific plugins
+  enabled_plugins:
+    - crypto_detector
+    - medical_codes_detector
+    - custom_regex_detector
+
+
+# Language Pack Settings
+languages:
+  # Enable language pack system
+  enabled: true
+
+  # Language pack discovery directory
+  directory: "plugins/languages"
+
+  # Auto-discover language packs on startup
+  auto_discover: true
+
+  # Enabled language packs
+  enabled_packs:
+    - fr  # French
+    - de  # German
+    - ar  # Arabic
+
+
+# LLM Provider Settings
+llm:
+  # Enable LLM-based detection
+  enabled: false
+
+  # Default LLM provider (openai, anthropic, ollama)
+  default_provider: "openai"
+
+  # Cache LLM responses
+  cache_enabled: true
+
+  # Cache TTL (seconds)
+  cache_ttl: 3600
+
+  # Cache capacity (number of entries)
+  cache_capacity: 1000
+
+  # Rate limiting (requests per minute)
+  rate_limit: 10
+
+  # Providers configuration
+  providers:
+    openai:
+      enabled: false
+      model: "gpt-4"
+      # api_key: Set via OPENAI_API_KEY environment variable
+      temperature: 0.0
+      max_tokens: 1000
+
+    anthropic:
+      enabled: false
+      model: "claude-3-sonnet-20240229"
+      # api_key: Set via ANTHROPIC_API_KEY environment variable
+      temperature: 0.0
+      max_tokens: 1024
+
+    ollama:
+      enabled: false
+      model: "llama2:13b"
+      base_url: "http://localhost:11434"
+      timeout: 60
+
+
+# Enhanced Ensemble Detector Settings
+detector:
+  # Use base providers
+  use_ner: true
+  use_regex: true
+  use_presidio: true
+
+  # Enable plugin-based detection
+  enable_plugins: true
+
+  # Enable LLM-based detection
+  enable_llm: false
+
+  # Minimum confidence threshold
+  min_confidence: 0.0
+
+
+# Extension API Settings
+api:
+  # Enable extensions API endpoints
+  enabled: true
+
+  # Require API key for extension endpoints
+  require_auth: true
+
+  # Allow plugin upload via API
+  allow_upload: false
+
+  # Max upload size (MB)
+  max_upload_size_mb: 10
+
+
+# Monitoring and Logging
+monitoring:
+  # Log plugin execution
+  log_plugin_execution: true
+
+  # Log level (DEBUG, INFO, WARNING, ERROR)
+  log_level: "INFO"
+
+  # Performance monitoring
+  monitor_performance: true
+
+  # Plugin execution time threshold for warnings (ms)
+  slow_plugin_threshold_ms: 100

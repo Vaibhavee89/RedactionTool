@@ -23,7 +23,7 @@ from app.services.redaction.redactor import Redactor
 from app.services.redaction.image_redactor import ImageRedactor
 from app.services.redaction.video_redactor import VideoRedactor
 from app.core.config import Config
-from app.services.policy.policy_manager import PolicyManager
+from app.services.redaction.policy_manager import PolicyManager
 
 # Page Config
 st.set_page_config(

@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.services.pii.ensemble_detector import EnsembleDetector
 from app.services.redaction.enhanced_redactor import EnhancedRedactor
-from app.services.policy.policy_manager import PolicyManager
+from app.services.redaction.policy_manager import PolicyManager
 from app.services.audit.audit_logger import AuditLogger
 
 # Configuration from environment variables
@@ -50,6 +50,10 @@ app.add_middleware(
 detector = EnsembleDetector()
 redactor = EnhancedRedactor()
 audit_logger = AuditLogger(log_dir="audit_logs/api")
+
+# Include extensions router
+from api.extensions_router import router as extensions_router
+app.include_router(extensions_router)
 
 
 # ============================================================================
