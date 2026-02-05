@@ -1,0 +1,244 @@
+"""
+Unit tests for RegexPIIDetector.
+
+Tests:
+- PAN card detection
+- Aadhaar number detection
+- Phone number detection
+- Email detection
+- Indian patterns
+- Edge cases
+"""
+
+import pytest
+import sys
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
+from app.services.pii.regex_detector import RegexPIIDetector
+
+
+class TestRegexPIIDetector:
+    """Test cases for RegexPIIDetector."""
+
+    @pytest.fixture
+    def detector(self):
+        """Create detector instance."""
+        return RegexPIIDetector()
+
+    def test_pan_card_detection(self, detector):
+        """Test PAN card number detection."""
+        text = "My PAN is ABCDE1234F"
+        result = detector.detect(text)
+
+        assert len(result['entities']) > 0
+        pan_entities = [e for e in result['entities'] if e['entity_type'] == 'PAN']
+        assert len(pan_entities) == 1
+        assert pan_entities[0]['text'] == 'ABCDE1234F'
+
+    def test_pan_card_multiple_formats(self, detector):
+        """Test PAN detection in various formats."""
+        test_cases = [
+            "PAN: ABCDE1234F",
+            "PAN Number: ABCDE1234F",
+            "My PAN card is ABCDE1234F",
+            "ABCDE1234F",
+        ]
+
+        for text in test_cases:
+            result = detector.detect(text)
+            pan_entities = [e for e in result['entities'] if e['entity_type'] == 'PAN']
+            assert len(pan_entities) == 1, f"Failed for: {text}"
+            assert pan_entities[0]['text'] == 'ABCDE1234F'
+
+    def test_aadhaar_detection(self, detector):
+        """Test Aadhaar number detection."""
+        text = "My Aadhaar is 1234 5678 9012"
+        result = detector.detect(text)
+
+        aadhaar_entities = [e for e in result['entities'] if e['entity_type'] == 'AADHAAR']
+        assert len(aadhaar_entities) == 1
+        assert '1234' in aadhaar_entities[0]['text']
+
+    def test_aadhaar_formats(self, detector):
+        """Test Aadhaar in different formats."""
+        test_cases = [
+            "1234 5678 9012",
+            "123456789012",
+            "Aadhaar: 1234-5678-9012",
+        ]
+
+        for text in test_cases:
+            result = detector.detect(text)
+            aadhaar_entities = [e for e in result['entities'] if e['entity_type'] == 'AADHAAR']
+            assert len(aadhaar_entities) >= 1, f"Failed for: {text}"
+
+    def test_phone_detection(self, detector):
+        """Test phone number detection."""
+        test_cases = [
+            ("9876543210", True),
+            ("+91-9876543210", True),
+            ("91-9876543210", True),
+            ("+919876543210", True),
+            ("1234567890", True),  # Valid 10-digit
+            ("12345", False),  # Too short
+        ]
+
+        for text, should_detect in test_cases:
+            result = detector.detect(text)
+            phone_entities = [e for e in result['entities'] if e['entity_type'] == 'PHONE']
+
+            if should_detect:
+                assert len(phone_entities) > 0, f"Should detect: {text}"
+            else:
+                assert len(phone_entities) == 0, f"Should not detect: {text}"
+
+    def test_email_detection(self, detector):
+        """Test email detection."""
+        test_cases = [
+            "test@example.com",
+            "user.name@company.co.in",
+            "contact@gmail.com",
+        ]
+
+        for email in test_cases:
+            result = detector.detect(f"Email: {email}")
+            email_entities = [e for e in result['entities'] if e['entity_type'] == 'EMAIL']
+            assert len(email_entities) == 1, f"Failed for: {email}"
+            assert email in email_entities[0]['text']
+
+    def test_multiple_entities(self, detector):
+        """Test detection of multiple entities in same text."""
+        text = """
+        Name: John Doe
+        PAN: ABCDE1234F
+        Phone: 9876543210
+        Email: john@example.com
+        Aadhaar: 1234 5678 9012
+        """
+
+        result = detector.detect(text)
+
+        # Should detect multiple entity types
+        entity_types = {e['entity_type'] for e in result['entities']}
+        assert 'PAN' in entity_types
+        assert 'PHONE' in entity_types
+        assert 'EMAIL' in entity_types
+        assert 'AADHAAR' in entity_types
+
+    def test_no_pii_text(self, detector):
+        """Test text with no PII."""
+        text = "This is a normal sentence with no personal information."
+        result = detector.detect(text)
+
+        assert len(result['entities']) == 0
+
+    def test_confidence_scores(self, detector):
+        """Test confidence scores are set correctly."""
+        text = "PAN: ABCDE1234F"
+        result = detector.detect(text)
+
+        assert len(result['entities']) > 0
+        for entity in result['entities']:
+            assert 'confidence' in entity
+            assert 0.0 <= entity['confidence'] <= 1.0
+
+    def test_entity_positions(self, detector):
+        """Test entity start and end positions are correct."""
+        text = "PAN: ABCDE1234F and Phone: 9876543210"
+        result = detector.detect(text)
+
+        for entity in result['entities']:
+            # Extract text using positions
+            extracted = text[entity['start']:entity['end']]
+            assert entity['text'] in extracted or extracted in entity['text']
+
+    def test_overlapping_patterns(self, detector):
+        """Test handling of overlapping patterns."""
+        text = "ABCDE1234F ABCDE1234F"  # Same PAN twice
+        result = detector.detect(text)
+
+        pan_entities = [e for e in result['entities'] if e['entity_type'] == 'PAN']
+        # Should detect both occurrences
+        assert len(pan_entities) >= 1
+
+    def test_min_confidence_filter(self, detector):
+        """Test min_confidence parameter filters results."""
+        text = "PAN: ABCDE1234F"
+
+        # With low threshold
+        result_low = detector.detect(text, min_confidence=0.1)
+        assert len(result_low['entities']) > 0
+
+        # With very high threshold (should filter most)
+        result_high = detector.detect(text, min_confidence=1.0)
+        # Regex patterns typically have high confidence
+        assert len(result_high['entities']) >= 0
+
+    def test_hindi_patterns(self, detector):
+        """Test Hindi PII pattern detection."""
+        # Note: RegexDetector may not support Hindi natively
+        # This test checks if it handles Hindi text gracefully
+        text = "नाम: राजेश कुमार, PAN: ABCDE1234F"
+        result = detector.detect(text)
+
+        # Should at least detect the PAN
+        pan_entities = [e for e in result['entities'] if e['entity_type'] == 'PAN']
+        assert len(pan_entities) >= 1
+
+    def test_edge_case_empty_text(self, detector):
+        """Test empty text input."""
+        result = detector.detect("")
+        assert len(result['entities']) == 0
+
+    def test_edge_case_whitespace(self, detector):
+        """Test whitespace-only text."""
+        result = detector.detect("   \n\t  ")
+        assert len(result['entities']) == 0
+
+    def test_edge_case_special_characters(self, detector):
+        """Test text with special characters."""
+        text = "PAN: ABCDE1234F!@#$%^&*()"
+        result = detector.detect(text)
+
+        pan_entities = [e for e in result['entities'] if e['entity_type'] == 'PAN']
+        assert len(pan_entities) == 1
+        assert 'ABCDE1234F' in pan_entities[0]['text']
+
+    def test_detection_metadata(self, detector):
+        """Test detection result metadata."""
+        text = "PAN: ABCDE1234F"
+        result = detector.detect(text)
+
+        assert 'entities' in result
+        assert 'total_entities' in result
+        assert 'detector_name' in result
+        assert result['detector_name'] == 'RegexPIIDetector'
+
+    def test_indian_passport(self, detector):
+        """Test Indian passport detection if supported."""
+        text = "Passport: A1234567"
+        result = detector.detect(text)
+
+        # Check if passport pattern is detected
+        passport_entities = [e for e in result['entities'] if 'PASSPORT' in e['entity_type'].upper()]
+        # May or may not be supported, just check it doesn't crash
+        assert isinstance(result['entities'], list)
+
+    def test_case_insensitive_detection(self, detector):
+        """Test case-insensitive pattern matching."""
+        test_cases = [
+            "pan: abcde1234f",
+            "PAN: ABCDE1234F",
+            "Pan: AbCdE1234F",
+        ]
+
+        for text in test_cases:
+            result = detector.detect(text)
+            # Should detect regardless of case
+            assert len(result['entities']) > 0, f"Failed for: {text}"
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

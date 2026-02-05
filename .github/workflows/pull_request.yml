@@ -1,0 +1,276 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-info:
+    name: PR Information
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: PR Details
+      run: |
+        echo "## Pull Request Information" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Title:** ${{ github.event.pull_request.title }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Author:** ${{ github.event.pull_request.user.login }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Base:** ${{ github.event.pull_request.base.ref }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Head:** ${{ github.event.pull_request.head.ref }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commits:** ${{ github.event.pull_request.commits }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+  changed-files:
+    name: Check Changed Files
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Get changed files
+      id: changed-files
+      run: |
+        echo "## Changed Files" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | tee changed_files.txt
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        cat changed_files.txt >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+
+    - name: Check for test files
+      run: |
+        if git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -q 'app/'; then
+          if ! git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -q 'test'; then
+            echo "::warning::Code changes detected without corresponding test changes"
+          fi
+        fi
+
+  quick-tests:
+    name: Quick Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-xdist
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Run quick tests (parallel)
+      run: |
+        pytest tests/unit/ -n auto --tb=line --maxfail=5 --timeout=60
+      timeout-minutes: 5
+
+  code-quality:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort radon
+
+    - name: Check code formatting
+      run: |
+        black --check app/ tests/ 2>&1 | tee black_output.txt || true
+        if [ -s black_output.txt ]; then
+          echo "## Black Formatting Issues" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat black_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Check import sorting
+      run: |
+        isort --check-only --diff app/ tests/ 2>&1 | tee isort_output.txt || true
+        if [ -s isort_output.txt ]; then
+          echo "## Import Sorting Issues" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          head -n 50 isort_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Calculate complexity
+      run: |
+        echo "## Code Complexity" >> $GITHUB_STEP_SUMMARY
+        radon cc app/ -s -a | tee complexity.txt
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        head -n 20 complexity.txt >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+
+  documentation:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Check for README
+      run: |
+        if [ ! -f README.md ]; then
+          echo "::warning::README.md not found"
+        fi
+
+    - name: Check for documentation updates
+      run: |
+        if git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -q 'app/'; then
+          if ! git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -q '.md'; then
+            echo "::notice::Consider updating documentation for code changes"
+          fi
+        fi
+
+  dependencies:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Check requirements.txt
+      run: |
+        if [ -f requirements.txt ]; then
+          echo "## Dependencies" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat requirements.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Check for new dependencies
+      run: |
+        if git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -q 'requirements.txt'; then
+          echo "::notice::Dependencies changed - ensure they are necessary"
+        fi
+
+  performance:
+    name: Performance Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-benchmark
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Run performance tests
+      run: |
+        if [ -d tests/performance ]; then
+          pytest tests/performance/ --benchmark-only || echo "::notice::No performance tests found"
+        else
+          echo "::notice::No performance test directory found"
+        fi
+      continue-on-error: true
+
+  pr-size:
+    name: PR Size Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Calculate PR size
+      run: |
+        additions=$(git diff --numstat ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | awk '{sum+=$1} END {print sum}')
+        deletions=$(git diff --numstat ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | awk '{sum+=$2} END {print sum}')
+        files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | wc -l)
+
+        echo "## PR Size" >> $GITHUB_STEP_SUMMARY
+        echo "- **Files changed:** $files" >> $GITHUB_STEP_SUMMARY
+        echo "- **Lines added:** $additions" >> $GITHUB_STEP_SUMMARY
+        echo "- **Lines deleted:** $deletions" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        total=$((additions + deletions))
+        if [ $total -gt 1000 ]; then
+          echo "::warning::Large PR detected ($total lines changed). Consider breaking into smaller PRs."
+        fi
+
+  label-check:
+    name: Label Management
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check labels
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const labels = context.payload.pull_request.labels.map(l => l.name);
+          core.info(`Labels: ${labels.join(', ')}`);
+
+          // Suggest labels based on changed files
+          const files = await github.rest.pulls.listFiles({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.payload.pull_request.number
+          });
+
+          const filenames = files.data.map(f => f.filename);
+          const suggestions = [];
+
+          if (filenames.some(f => f.includes('test'))) {
+            suggestions.push('tests');
+          }
+          if (filenames.some(f => f.includes('doc') || f.endsWith('.md'))) {
+            suggestions.push('documentation');
+          }
+          if (filenames.some(f => f.includes('requirements.txt'))) {
+            suggestions.push('dependencies');
+          }
+
+          if (suggestions.length > 0) {
+            core.info(`Suggested labels: ${suggestions.join(', ')}`);
+          }
+
+  pr-summary:
+    name: PR Summary
+    runs-on: ubuntu-latest
+    needs: [pr-info, changed-files, quick-tests, code-quality, pr-size]
+    if: always()
+
+    steps:
+    - name: Generate summary
+      run: |
+        echo "## Pull Request Check Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Results" >> $GITHUB_STEP_SUMMARY
+        echo "- PR Info: ${{ needs.pr-info.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Changed Files: ${{ needs.changed-files.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Quick Tests: ${{ needs.quick-tests.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Code Quality: ${{ needs.code-quality.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- PR Size: ${{ needs.pr-size.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        if [ "${{ needs.quick-tests.result }}" == "failure" ]; then
+          echo "::error::Quick tests failed - fix before merging"
+          exit 1
+        fi
+
+        echo "✅ PR checks completed"
