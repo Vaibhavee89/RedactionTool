@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  redaction-app:
+    build: .
+    container_name: redaction_tool
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./output:/app/output
+    environment:
+      - TESSERACT_CMD=tesseract
+    restart: unless-stopped

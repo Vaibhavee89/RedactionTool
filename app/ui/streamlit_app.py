@@ -1,4 +1,10 @@
 import streamlit as st
+import sys
+import os
+
+# Fix path for Streamlit Cloud to ensure 'app' module is found
+# Should point to the project root (2 levels up from app/ui/streamlit_app.py)
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 import io
 import os
 import tempfile

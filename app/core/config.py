@@ -12,7 +12,11 @@ class Config:
     
     # Tesseract
     # Try different common paths or environment variable
-    TESSERACT_CMD = os.getenv("TESSERACT_CMD", '/opt/homebrew/bin/tesseract')
+    # Default to 'tesseract' (PATH) if specific path doesn't exist
+    _MAC_PATH = '/opt/homebrew/bin/tesseract'
+    _DEFAULT_CMD = _MAC_PATH if os.path.exists(_MAC_PATH) else 'tesseract'
+    
+    TESSERACT_CMD = os.getenv("TESSERACT_CMD", _DEFAULT_CMD)
     
     # Models
     SPACY_MODEL_EN = "en_core_web_sm"

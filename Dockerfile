@@ -1,38 +1,46 @@
-# Use official Python slim image
+# Use official Python 3.10 slim image
 FROM python:3.10-slim
 
-# Install system dependencies (Tesseract, Poppler for PDFs, OpenCV dependencies, etc.)
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    TESSERACT_CMD=tesseract
+
+# Install system dependencies
+# tesseract-ocr: for OCR
+# libgl1-mesa-glx, libglib2.0-0, libsm6, libxext6: for OpenCV
 RUN apt-get update && apt-get install -y \
     build-essential \
     tesseract-ocr \
     libtesseract-dev \
-    poppler-utils \
-    ffmpeg \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
     libsm6 \
     libxext6 \
+    libxrender-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Copy requirements file first for layer caching
-COPY requirements.txt .
-
 # Install Python dependencies
+COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Download necessary spaCy models (in one layer)
-RUN python -m spacy download en_core_web_trf && \
+# Download spaCy models
+# Note: we use the smaller model for the container to keep size reasonable
+RUN python -m spacy download en_core_web_sm && \
     python -m spacy download xx_ent_wiki_sm
 
-
-
-# Copy all remaining application code
+# Copy application code
 COPY . .
 
-# Expose Streamlit’s default port
+# Create directory for uploads if it doesn't exist
+RUN mkdir -p uploads output
+
+# Expose Streamlit port
 EXPOSE 8501
 
-# Set Streamlit as the default command
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Run the application
+CMD ["streamlit", "run", "app/ui/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
