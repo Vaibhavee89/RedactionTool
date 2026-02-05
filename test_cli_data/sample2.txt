@@ -1,0 +1,12 @@
+Customer Support Ticket
+
+Ticket ID: 12345
+Customer: Priya Singh
+Contact: 9123456789
+Email: priya.singh@company.in
+
+Issue: Account verification needed
+PAN: XYZAB5678C
+
+Resolution: Verified customer identity using Aadhaar (2345 6789 0123)
+Status: Resolved

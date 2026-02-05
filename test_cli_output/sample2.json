@@ -1,0 +1,100 @@
+{
+  "original_file": "test_cli_data/sample2.txt",
+  "redacted_text": "Customer Support Ticket\n\nTicket ID: █████\nCustomer: ███████████\nContact: ██████████\nEmail: ██████████████████████\n\nIssue: Account verification needed\n███: ██████████\n\nResolution: Verified customer identity using ███████ (██████████████)\nStatus: Resolved\n",
+  "entities": [
+    {
+      "entity_type": "DATE_TIME",
+      "start": 36,
+      "end": 41,
+      "text": "12345",
+      "confidence": 0.85,
+      "source": "presidio",
+      "recognition_metadata": {
+        "recognizer_name": "SpacyRecognizer",
+        "recognizer_identifier": "SpacyRecognizer_6124300544"
+      }
+    },
+    {
+      "entity_type": "PERSON",
+      "start": 52,
+      "end": 63,
+      "text": "Priya Singh",
+      "confidence": 0.85,
+      "source": "presidio",
+      "recognition_metadata": {
+        "recognizer_name": "SpacyRecognizer",
+        "recognizer_identifier": "SpacyRecognizer_6124300544"
+      }
+    },
+    {
+      "entity_type": "PHONE_IN",
+      "start": 73,
+      "end": 83,
+      "text": "9123456789",
+      "confidence": 0.9,
+      "source": "regex",
+      "pattern": "PHONE_IN"
+    },
+    {
+      "entity_type": "EMAIL",
+      "start": 91,
+      "end": 113,
+      "text": "priya.singh@company.in",
+      "confidence": 0.95,
+      "source": "regex",
+      "pattern": "EMAIL"
+    },
+    {
+      "entity_type": "ORGANIZATION",
+      "start": 150,
+      "end": 153,
+      "text": "PAN",
+      "confidence": 0.85,
+      "source": "presidio",
+      "recognition_metadata": {
+        "recognizer_name": "SpacyRecognizer",
+        "recognizer_identifier": "SpacyRecognizer_6124300544"
+      }
+    },
+    {
+      "entity_type": "PAN",
+      "start": 155,
+      "end": 165,
+      "text": "XYZAB5678C",
+      "confidence": 1.0,
+      "source": "presidio",
+      "recognition_metadata": {
+        "recognizer_name": "PANRecognizer",
+        "recognizer_identifier": "PANRecognizer_6124296848"
+      }
+    },
+    {
+      "entity_type": "ORGANIZATION",
+      "start": 212,
+      "end": 219,
+      "text": "Aadhaar",
+      "confidence": 0.85,
+      "source": "presidio",
+      "recognition_metadata": {
+        "recognizer_name": "SpacyRecognizer",
+        "recognizer_identifier": "SpacyRecognizer_6124300544"
+      }
+    },
+    {
+      "entity_type": "AADHAAR",
+      "start": 221,
+      "end": 235,
+      "text": "2345 6789 0123",
+      "confidence": 0.9,
+      "source": "regex",
+      "pattern": "AADHAAR"
+    }
+  ],
+  "metadata": {
+    "entities_detected": 8,
+    "entities_redacted": 8,
+    "redaction_mode": "block",
+    "confidence_threshold": 0.5,
+    "timestamp": "2026-02-05T19:27:17.820337"
+  }
+}

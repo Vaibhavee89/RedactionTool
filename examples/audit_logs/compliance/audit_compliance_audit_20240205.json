@@ -1,0 +1,75 @@
+{
+  "session_id": "20260205_194208",
+  "generated_at": "2026-02-05T19:42:08.740585",
+  "total_entries": 1,
+  "privacy_notice": "No raw PII is stored in this audit log. Document IDs and entity text are hashed.",
+  "logs": [
+    {
+      "log_id": "20260205_194208_0000",
+      "timestamp": "2026-02-05T19:42:08.740578",
+      "document": {
+        "filename": "sensitive_financial_data.pdf",
+        "extension": ".pdf",
+        "document_id": "af37542adfd2e3f8ffb624c25534507b7d2ca103c31bf49a5877c7c00ef2b203",
+        "masked_path": "****/sensitive_financial_data.pdf"
+      },
+      "document_id": "af37542adfd2e3f8ffb624c25534507b7d2ca103c31bf49a5877c7c00ef2b203",
+      "policy": {
+        "policy_name": "india_finance_compliance",
+        "policy_applied": true
+      },
+      "entities": {
+        "total_detected": 3,
+        "by_type": {
+          "PERSON": 1,
+          "PAN": 1,
+          "AADHAAR": 1
+        },
+        "details": [
+          {
+            "entity_type": "PERSON",
+            "entity_hash": "2d426be6a60758d53dd363579b1e3a84e2b0a6920b81b3eafb504761960e9053",
+            "confidence": 0.95,
+            "source": "spacy",
+            "start_position": 0,
+            "end_position": 12,
+            "action_taken": "mask"
+          },
+          {
+            "entity_type": "PAN",
+            "entity_hash": "6442fd73a940c1186d6268bd27f89233e12429902c7805037e8aab6e717be6d9",
+            "confidence": 0.98,
+            "source": "regex",
+            "start_position": 20,
+            "end_position": 30,
+            "action_taken": "block"
+          },
+          {
+            "entity_type": "AADHAAR",
+            "entity_hash": "6a3eef274499e9ad0a98ca5101dc36d9e1dd777a041efc9e166c4dcdda69fd25",
+            "confidence": 0.96,
+            "source": "regex",
+            "start_position": 35,
+            "end_position": 49,
+            "action_taken": "block"
+          }
+        ]
+      },
+      "actions": {
+        "PERSON": "mask",
+        "PAN": "block",
+        "AADHAAR": "block"
+      },
+      "result": {
+        "success": true,
+        "error_message": null,
+        "processing_time_ms": 156.7
+      },
+      "privacy": {
+        "document_id_hashed": true,
+        "entity_text_hashed": true,
+        "raw_pii_stored": false
+      }
+    }
+  ]
+}

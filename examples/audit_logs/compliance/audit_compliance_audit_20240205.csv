@@ -1,0 +1,2 @@
+log_id,timestamp,document_id,filename,extension,masked_path,policy_name,total_entities,entity_types,success,error_message,processing_time_ms
+20260205_194208_0000,2026-02-05T19:42:08.740578,af37542adfd2e3f8ffb624c25534507b7d2ca103c31bf49a5877c7c00ef2b203,sensitive_financial_data.pdf,.pdf,****/sensitive_financial_data.pdf,india_finance_compliance,3,"PERSON:1, PAN:1, AADHAAR:1",True,,156.7

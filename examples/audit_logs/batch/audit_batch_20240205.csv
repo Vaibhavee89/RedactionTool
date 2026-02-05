@@ -1,0 +1,4 @@
+log_id,timestamp,document_id,filename,extension,masked_path,policy_name,total_entities,entity_types,success,error_message,processing_time_ms
+20260205_194208_0000,2026-02-05T19:42:08.739146,34c49a7dd53c393aa1efc4646e1990f162c288c7c72b1946525a005fab93d0fc,contract_001.pdf,.pdf,****/contract_001.pdf,company_policy,1,EMAIL:1,True,,100.0
+20260205_194208_0001,2026-02-05T19:42:08.739173,38a3f0c8c0ade5834b76d53e237589577f987cdc581a2b99f2f8122c67730632,invoice_002.docx,.docx,****/invoice_002.docx,company_policy,1,EMAIL:1,True,,110.0
+20260205_194208_0002,2026-02-05T19:42:08.739194,a32c435b20b9e01f27c69e99dc0916ec2b28661f5bff2d2a4c5df7b7e31a80d0,customer_data.xlsx,.xlsx,****/customer_data.xlsx,company_policy,1,EMAIL:1,True,,120.0

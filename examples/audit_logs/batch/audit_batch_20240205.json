@@ -1,0 +1,143 @@
+{
+  "session_id": "20260205_194208",
+  "generated_at": "2026-02-05T19:42:08.739201",
+  "total_entries": 3,
+  "privacy_notice": "No raw PII is stored in this audit log. Document IDs and entity text are hashed.",
+  "logs": [
+    {
+      "log_id": "20260205_194208_0000",
+      "timestamp": "2026-02-05T19:42:08.739146",
+      "document": {
+        "filename": "contract_001.pdf",
+        "extension": ".pdf",
+        "document_id": "34c49a7dd53c393aa1efc4646e1990f162c288c7c72b1946525a005fab93d0fc",
+        "masked_path": "****/contract_001.pdf"
+      },
+      "document_id": "34c49a7dd53c393aa1efc4646e1990f162c288c7c72b1946525a005fab93d0fc",
+      "policy": {
+        "policy_name": "company_policy",
+        "policy_applied": true
+      },
+      "entities": {
+        "total_detected": 1,
+        "by_type": {
+          "EMAIL": 1
+        },
+        "details": [
+          {
+            "entity_type": "EMAIL",
+            "entity_hash": "7a515783a3568eb1011685850081ba63e5016267a7a7d9ccd8c21064de10df26",
+            "confidence": 0.95,
+            "source": "presidio",
+            "start_position": 0,
+            "end_position": 20,
+            "action_taken": "block"
+          }
+        ]
+      },
+      "actions": {
+        "EMAIL": "block"
+      },
+      "result": {
+        "success": true,
+        "error_message": null,
+        "processing_time_ms": 100.0
+      },
+      "privacy": {
+        "document_id_hashed": true,
+        "entity_text_hashed": true,
+        "raw_pii_stored": false
+      }
+    },
+    {
+      "log_id": "20260205_194208_0001",
+      "timestamp": "2026-02-05T19:42:08.739173",
+      "document": {
+        "filename": "invoice_002.docx",
+        "extension": ".docx",
+        "document_id": "38a3f0c8c0ade5834b76d53e237589577f987cdc581a2b99f2f8122c67730632",
+        "masked_path": "****/invoice_002.docx"
+      },
+      "document_id": "38a3f0c8c0ade5834b76d53e237589577f987cdc581a2b99f2f8122c67730632",
+      "policy": {
+        "policy_name": "company_policy",
+        "policy_applied": true
+      },
+      "entities": {
+        "total_detected": 1,
+        "by_type": {
+          "EMAIL": 1
+        },
+        "details": [
+          {
+            "entity_type": "EMAIL",
+            "entity_hash": "a8cc79d8407a64b0d8982df34e3525afd298a479fe68f300651380730dbf23e9",
+            "confidence": 0.95,
+            "source": "presidio",
+            "start_position": 0,
+            "end_position": 20,
+            "action_taken": "block"
+          }
+        ]
+      },
+      "actions": {
+        "EMAIL": "block"
+      },
+      "result": {
+        "success": true,
+        "error_message": null,
+        "processing_time_ms": 110.0
+      },
+      "privacy": {
+        "document_id_hashed": true,
+        "entity_text_hashed": true,
+        "raw_pii_stored": false
+      }
+    },
+    {
+      "log_id": "20260205_194208_0002",
+      "timestamp": "2026-02-05T19:42:08.739194",
+      "document": {
+        "filename": "customer_data.xlsx",
+        "extension": ".xlsx",
+        "document_id": "a32c435b20b9e01f27c69e99dc0916ec2b28661f5bff2d2a4c5df7b7e31a80d0",
+        "masked_path": "****/customer_data.xlsx"
+      },
+      "document_id": "a32c435b20b9e01f27c69e99dc0916ec2b28661f5bff2d2a4c5df7b7e31a80d0",
+      "policy": {
+        "policy_name": "company_policy",
+        "policy_applied": true
+      },
+      "entities": {
+        "total_detected": 1,
+        "by_type": {
+          "EMAIL": 1
+        },
+        "details": [
+          {
+            "entity_type": "EMAIL",
+            "entity_hash": "706150f3ef810ea66acb30c6d55f1a7e545338747072609e47df71c7c7ccc6a4",
+            "confidence": 0.95,
+            "source": "presidio",
+            "start_position": 0,
+            "end_position": 20,
+            "action_taken": "block"
+          }
+        ]
+      },
+      "actions": {
+        "EMAIL": "block"
+      },
+      "result": {
+        "success": true,
+        "error_message": null,
+        "processing_time_ms": 120.0
+      },
+      "privacy": {
+        "document_id_hashed": true,
+        "entity_text_hashed": true,
+        "raw_pii_stored": false
+      }
+    }
+  ]
+}

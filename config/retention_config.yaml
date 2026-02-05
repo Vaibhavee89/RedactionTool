@@ -1,0 +1,67 @@
+# Audit Log Retention Configuration
+# Enterprise compliance settings
+
+retention:
+  # Number of days to retain audit logs
+  retention_days: 90
+
+  # Enable archival (move old logs to archive instead of deleting)
+  archive_enabled: true
+
+  # Archive directory path (relative to audit_logs directory)
+  archive_path: "archive"
+
+logging:
+  # Enable CSV export alongside JSON
+  enable_csv: true
+
+  # Hash document IDs for privacy (recommended: true)
+  hash_documents: true
+
+  # Audit log directory
+  log_directory: "audit_logs"
+
+privacy:
+  # Store raw PII in audit logs (NEVER set to true for compliance)
+  store_raw_pii: false
+
+  # Hash entity text (recommended: true)
+  hash_entity_text: true
+
+  # Mask file paths in logs
+  mask_file_paths: true
+
+  # Number of path components to show (1 = filename only)
+  show_path_components: 1
+
+compliance:
+  # Compliance frameworks (for documentation purposes)
+  frameworks:
+    - "GDPR"
+    - "HIPAA"
+    - "SOC2"
+    - "ISO27001"
+
+  # Required audit log fields
+  required_fields:
+    - "timestamp"
+    - "document_id"
+    - "policy_name"
+    - "entity_counts"
+    - "actions_taken"
+    - "success_status"
+
+  # Audit log review period (days)
+  review_period: 30
+
+# Automated cleanup schedule (for cron jobs)
+cleanup:
+  # Enable automated cleanup
+  enabled: true
+
+  # Schedule (cron format)
+  # Default: Run daily at 2 AM
+  schedule: "0 2 * * *"
+
+  # Notify on cleanup
+  notify_email: "compliance@example.com"

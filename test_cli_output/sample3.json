@@ -1,0 +1,64 @@
+{
+  "original_file": "test_cli_data/sample3.txt",
+  "redacted_text": "Meeting Notes - Project Discussion\n\nDate: ██████████\nAttendees: Team members from engineering and product\n\nTopics Discussed:\n█. Sprint planning for ███████\n█. Technical architecture review\n█. Performance optimization strategies\n\nAction Items:\n- Update project timeline\n- Review technical specifications\n- Schedule follow-up meeting\n\nNo sensitive information in this document.\n",
+  "entities": [
+    {
+      "entity_type": "DATE_YMD",
+      "start": 42,
+      "end": 52,
+      "text": "2024-02-05",
+      "confidence": 0.75,
+      "source": "regex",
+      "pattern": "DATE_YMD"
+    },
+    {
+      "entity_type": "NUMBER",
+      "original_label": "CARDINAL",
+      "start": 125,
+      "end": 126,
+      "text": "1",
+      "confidence": 0.7000000000000001,
+      "source": "ner",
+      "language": "en"
+    },
+    {
+      "entity_type": "DATE_TIME",
+      "start": 148,
+      "end": 155,
+      "text": "Q1 2024",
+      "confidence": 0.85,
+      "source": "presidio",
+      "recognition_metadata": {
+        "recognizer_name": "SpacyRecognizer",
+        "recognizer_identifier": "SpacyRecognizer_6124300544"
+      }
+    },
+    {
+      "entity_type": "NUMBER",
+      "original_label": "CARDINAL",
+      "start": 156,
+      "end": 157,
+      "text": "2",
+      "confidence": 0.7000000000000001,
+      "source": "ner",
+      "language": "en"
+    },
+    {
+      "entity_type": "NUMBER",
+      "original_label": "CARDINAL",
+      "start": 189,
+      "end": 190,
+      "text": "3",
+      "confidence": 0.7000000000000001,
+      "source": "ner",
+      "language": "en"
+    }
+  ],
+  "metadata": {
+    "entities_detected": 5,
+    "entities_redacted": 5,
+    "redaction_mode": "block",
+    "confidence_threshold": 0.5,
+    "timestamp": "2026-02-05T19:27:17.854059"
+  }
+}

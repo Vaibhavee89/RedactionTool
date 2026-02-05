@@ -1,0 +1,75 @@
+{
+  "session_id": "20260205_194208",
+  "generated_at": "2026-02-05T19:42:08.613344",
+  "total_entries": 1,
+  "privacy_notice": "No raw PII is stored in this audit log. Document IDs and entity text are hashed.",
+  "logs": [
+    {
+      "log_id": "20260205_194208_0000",
+      "timestamp": "2026-02-05T19:42:08.613334",
+      "document": {
+        "filename": "employee_records.pdf",
+        "extension": ".pdf",
+        "document_id": "e742326babedf0164c39aac430babe7064d5e6f7eb02e36ae2844861ecafeb1c",
+        "masked_path": "****/employee_records.pdf"
+      },
+      "document_id": "e742326babedf0164c39aac430babe7064d5e6f7eb02e36ae2844861ecafeb1c",
+      "policy": {
+        "policy_name": "gdpr_basic",
+        "policy_applied": true
+      },
+      "entities": {
+        "total_detected": 3,
+        "by_type": {
+          "EMAIL": 1,
+          "PERSON": 1,
+          "PHONE": 1
+        },
+        "details": [
+          {
+            "entity_type": "EMAIL",
+            "entity_hash": "ebab270a7734bf8fa1a226afabe8becb717f3bd011c1ef4c45714fc4ab57398d",
+            "confidence": 0.95,
+            "source": "presidio",
+            "start_position": 45,
+            "end_position": 65,
+            "action_taken": "block"
+          },
+          {
+            "entity_type": "PERSON",
+            "entity_hash": "6cea57c2fb6cbc2a40411135005760f241fffc3e5e67ab99882726431037f908",
+            "confidence": 0.92,
+            "source": "spacy",
+            "start_position": 10,
+            "end_position": 18,
+            "action_taken": "mask"
+          },
+          {
+            "entity_type": "PHONE",
+            "entity_hash": "a0689279dc60e414c6ce71508cffa78da4e6276437f8780558fa9ccf39962a45",
+            "confidence": 0.88,
+            "source": "presidio",
+            "start_position": 70,
+            "end_position": 81,
+            "action_taken": "label"
+          }
+        ]
+      },
+      "actions": {
+        "EMAIL": "block",
+        "PERSON": "mask",
+        "PHONE": "label"
+      },
+      "result": {
+        "success": true,
+        "error_message": null,
+        "processing_time_ms": 125.3
+      },
+      "privacy": {
+        "document_id_hashed": true,
+        "entity_text_hashed": true,
+        "raw_pii_stored": false
+      }
+    }
+  ]
+}

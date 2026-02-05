@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Redacted: sample1.txt</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }
+        .content { margin-top: 20px; white-space: pre-wrap; }
+        .stats { background: #e8f4f8; padding: 15px; border-radius: 5px; margin-top: 20px; }
+        .entity { background: #fff3cd; padding: 2px 5px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Redacted Document</h1>
+        <p><strong>Original:</strong> test_cli_data/sample1.txt</p>
+        <p><strong>Redacted:</strong> 2026-02-05 19:27:17</p>
+    </div>
+
+    <div class="stats">
+        <h2>Redaction Statistics</h2>
+        <ul>
+            <li>Entities detected: 10</li>
+            <li>Redaction mode: block</li>
+            <li>Confidence threshold: 0.5</li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <h2>Redacted Content</h2>
+        <pre>Personal Information Form
+
+Name: ███████████████████
+████████: ██████████
+Aadhaar Number: ██████████████
+Mobile: +█████████████
+Email: █████████████████████████
+
+Address:
+███ MG Road
+██████, █████████████████████████████████: ██████████
+</pre>
+    </div>
+</body>
+</html>

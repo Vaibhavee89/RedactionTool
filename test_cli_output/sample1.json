@@ -1,0 +1,119 @@
+{
+  "original_file": "test_cli_data/sample1.txt",
+  "redacted_text": "Personal Information Form\n\nName: ███████████████████\n████████: ██████████\nAadhaar Number: ██████████████\nMobile: +█████████████\nEmail: █████████████████████████\n\nAddress:\n███ MG Road\n██████, █████████████████████████████████: ██████████\n",
+  "entities": [
+    {
+      "entity_type": "PERSON",
+      "start": 33,
+      "end": 52,
+      "text": "Rajesh Kumar Sharma",
+      "confidence": 0.85,
+      "source": "presidio",
+      "recognition_metadata": {
+        "recognizer_name": "SpacyRecognizer",
+        "recognizer_identifier": "SpacyRecognizer_6124300544"
+      }
+    },
+    {
+      "entity_type": "ORGANIZATION",
+      "start": 53,
+      "end": 61,
+      "text": "PAN Card",
+      "confidence": 0.85,
+      "source": "presidio",
+      "recognition_metadata": {
+        "recognizer_name": "SpacyRecognizer",
+        "recognizer_identifier": "SpacyRecognizer_6124300544"
+      }
+    },
+    {
+      "entity_type": "PAN",
+      "start": 63,
+      "end": 73,
+      "text": "ABCDE1234F",
+      "confidence": 1.0,
+      "source": "presidio",
+      "recognition_metadata": {
+        "recognizer_name": "PANRecognizer",
+        "recognizer_identifier": "PANRecognizer_6124296848"
+      }
+    },
+    {
+      "entity_type": "AADHAAR",
+      "start": 90,
+      "end": 104,
+      "text": "1234 5678 9012",
+      "confidence": 0.9,
+      "source": "regex",
+      "pattern": "AADHAAR"
+    },
+    {
+      "entity_type": "PHONE_IN",
+      "start": 114,
+      "end": 127,
+      "text": "91-9876543210",
+      "confidence": 0.9,
+      "source": "regex",
+      "pattern": "PHONE_IN"
+    },
+    {
+      "entity_type": "EMAIL",
+      "start": 135,
+      "end": 160,
+      "text": "rajesh.sharma@example.com",
+      "confidence": 0.95,
+      "source": "regex",
+      "pattern": "EMAIL"
+    },
+    {
+      "entity_type": "NUMBER",
+      "original_label": "CARDINAL",
+      "start": 171,
+      "end": 174,
+      "text": "123",
+      "confidence": 0.8,
+      "source": "ner",
+      "language": "en"
+    },
+    {
+      "entity_type": "LOCATION",
+      "start": 183,
+      "end": 189,
+      "text": "Mumbai",
+      "confidence": 0.85,
+      "source": "presidio",
+      "recognition_metadata": {
+        "recognizer_name": "SpacyRecognizer",
+        "recognizer_identifier": "SpacyRecognizer_6124300544"
+      }
+    },
+    {
+      "entity_type": "ORGANIZATION",
+      "start": 191,
+      "end": 224,
+      "text": "Maharashtra 400001\n\nDate of Birth",
+      "confidence": 0.85,
+      "source": "presidio",
+      "recognition_metadata": {
+        "recognizer_name": "SpacyRecognizer",
+        "recognizer_identifier": "SpacyRecognizer_6124300544"
+      }
+    },
+    {
+      "entity_type": "DATE_DMY",
+      "start": 226,
+      "end": 236,
+      "text": "15/01/1985",
+      "confidence": 0.75,
+      "source": "regex",
+      "pattern": "DATE_DMY"
+    }
+  ],
+  "metadata": {
+    "entities_detected": 10,
+    "entities_redacted": 10,
+    "redaction_mode": "block",
+    "confidence_threshold": 0.5,
+    "timestamp": "2026-02-05T19:27:17.793536"
+  }
+}

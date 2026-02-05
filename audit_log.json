@@ -1,0 +1,52 @@
+{
+  "summary": {
+    "total_files": 3,
+    "processed_files": 3,
+    "failed_files": 0,
+    "skipped_files": 0,
+    "total_entities": 23,
+    "redacted_entities": 23,
+    "success_rate": 100.0
+  },
+  "configuration": {
+    "input_path": "test_cli_data",
+    "output_path": "test_cli_output",
+    "policy_file": null,
+    "redaction_mode": "block",
+    "confidence_threshold": 0.5,
+    "output_formats": [
+      "text",
+      "json",
+      "html"
+    ],
+    "dry_run": false
+  },
+  "timing": {
+    "start_time": "2026-02-05T19:27:17.666489",
+    "end_time": "2026-02-05T19:27:17.854369"
+  },
+  "errors": [],
+  "results": [
+    {
+      "file": "test_cli_data/sample1.txt",
+      "status": "success",
+      "entities_detected": 10,
+      "entities_redacted": 10,
+      "errors": []
+    },
+    {
+      "file": "test_cli_data/sample2.txt",
+      "status": "success",
+      "entities_detected": 8,
+      "entities_redacted": 8,
+      "errors": []
+    },
+    {
+      "file": "test_cli_data/sample3.txt",
+      "status": "success",
+      "entities_detected": 5,
+      "entities_redacted": 5,
+      "errors": []
+    }
+  ]
+}
